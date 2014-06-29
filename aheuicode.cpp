@@ -1,11 +1,12 @@
 #include "commonheader.h"
 #include "aheuicode.h"
 
-void AheuiCode::read_file(const string& file_name)
+bool AheuiCode::read_file(const string& file_name)
 {
   x_len = 0; y_len = 0;
   wstring buffer;
   wifstream ifs(file_name);
+  if(!ifs.is_open()) return false;
   while(getline(ifs,buffer))
   {
     codespace.push_back(buffer);
@@ -14,6 +15,7 @@ void AheuiCode::read_file(const string& file_name)
     y_len++;
   }
   ifs.close();
+  return true;
 }
 
 wchar_t AheuiCode::get_code(const unsigned int x, const unsigned int y)
