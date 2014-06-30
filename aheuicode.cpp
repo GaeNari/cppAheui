@@ -1,20 +1,27 @@
 #include "commonheader.h"
 #include "aheuicode.h"
 
-bool AheuiCode::read_file(const string& file_name)
+template<typename T>
+void AheuiCode::load_code(T& is)
 {
+  static_assert(std::is_convertible<T*, wistream*>::value, "input stream must be derived from wistream");
   x_len = 0; y_len = 0;
+  codespace.clear();
   wstring buffer;
-  wifstream ifs(file_name);
-  if(!ifs.is_open()) return false;
-  while(getline(ifs,buffer))
+  while(getline(is,buffer))
   {
     codespace.push_back(buffer);
     int line_len = buffer.length();
     if(x_len < line_len) x_len = line_len;
     y_len++;
   }
-  ifs.close();
+}
+
+bool AheuiCode::read_file(const string& file_name)
+{
+  wifstream ifs(file_name);
+  if(!ifs.is_open()) return false;
+  load_code<>(ifs);
   return true;
 }
 

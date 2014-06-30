@@ -8,6 +8,8 @@ private:
   vector<wstring> codespace;
 public:
   bool read_file(const string& file_name);
+  template<typename T>
+  void load_code(T& is);
   wchar_t get_code(const unsigned int x, const unsigned int y);
   tuple<int, int, int> split_code(const wchar_t code_char);
   void print_code();
