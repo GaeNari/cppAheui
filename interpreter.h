@@ -25,4 +25,6 @@ public:
   void initialize(AheuiCode *ah);
   void step();
   void move_cursor();
+  void show_code();
+  AheuiStorage* get_storage(int index);
 };

@@ -189,3 +189,28 @@ void AheuiInterpreter::move_cursor()
   if(cursor.y < 0) cursor.y = code->y_size() - 1;
   if(cursor.y >= code->y_size()) cursor.y = 0;
 }
+
+void AheuiInterpreter::show_code()
+{
+  code->show_code(cursor.x, cursor.y);
+}
+
+AheuiStorage* AheuiInterpreter::get_storage(int index)
+{
+  AheuiStorage *target;
+  switch(index)
+  {
+    case 21:
+      target = queue;
+      break;
+    case 27:
+      wcout << L"현재 확장기능 통로는 구현되어있지 않습니다" << endl;
+      target = nullptr;
+      assert(false);
+      break;
+    default:
+      target = stack[index];
+      break;
+  }
+  return target;
+}

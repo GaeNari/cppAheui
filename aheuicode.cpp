@@ -1,6 +1,9 @@
 #include "commonheader.h"
 #include "aheuicode.h"
 
+#define RESET_COLOR "\033[0m"
+#define MAKE_GREEN "\033[32m"
+
 bool AheuiCode::read_file(const string& file_name)
 {
   x_len = 0; y_len = 0;
@@ -38,13 +41,29 @@ tuple<int, int, int> AheuiCode::split_code(const wchar_t code_char)
     return make_tuple(-1,-1,-1);
 }
 
-void AheuiCode::print_code()
+void AheuiCode::show_code(int current_x, int current_y)
 {
-  vector<wstring>::const_iterator iter;
-  int i=0;
-  for(iter=codespace.begin(); iter!=codespace.end(); ++iter)
+  for(int i=0;i<y_len;i++)
   {
-    wcout << i++ << " " << (*iter) << endl;
+    if(i==current_y)
+    {
+      for(int j=0;j<codespace[i].length(); j++)
+      {
+	if(j==current_x)
+	{
+	  wcout << MAKE_GREEN << codespace[i][j] << RESET_COLOR;
+	}
+	else
+	{
+	  wcout << codespace[i][j];
+	}
+      }
+      wcout << endl;
+    }
+    else
+    {
+      wcout << codespace[i] << endl;
+    }
   }
 }
 

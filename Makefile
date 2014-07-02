@@ -1,5 +1,5 @@
 CC = g++
-OBJS = storage.o aheuicode.o interpreter.o main.o
+OBJS = storage.o aheuicode.o interpreter.o debugger.o main.o
 TARGET = main
 
 .SUFFIXES : .cpp .o
