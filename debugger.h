@@ -21,4 +21,5 @@ public:
   void set_breakpoint(int x, int y);
   void delete_breakpoint(int num);
   void step();
+  void step(int num);
 };

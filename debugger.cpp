@@ -34,3 +34,10 @@ void AheuiDebugger::step()
   target->step();
   target->move_cursor();
 }
+
+void AheuiDebugger::step(int num)
+{
+  assert(!(num<0));
+  while(num --> 0)
+    this->step();
+}

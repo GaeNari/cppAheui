@@ -32,13 +32,52 @@ int main(int argc, char **argv)
     debugger.initialize(&interpreter);
     while(true)
     {
-      wchar_t input;
+      wstring input;
+      wcout << endl;
       debugger.show_code();
+      getline(wcin,input);
+      int found = input.find(L" ");
+      wstring operation;
+      wstring argument;
+      bool arg_exist = false;
+      if(found != -1)
+      {
+	assert(input.length()>found);
+	operation = input.substr(0,found);
+	argument = input.substr(found+1);
+	arg_exist = true;
+      }
+      else
+	operation = input;
+      if(!operation.compare(L"step"))
+      {
+	if(arg_exist)
+	  debugger.step(stoi(argument));
+	else
+	  debugger.step();
+      }
+      else if(!operation.compare(L"print"))
+      {
+	assert(arg_exist);
+	debugger.show_storage(static_cast<wchar_t>(argument[0]));
+      }
+      else if(!operation.compare(L"break"))
+      {
+	//TODO: add breakpoint
+      }
+      else if(!operation.compare(L"clear"))
+      {
+	//TODO: remove breakpoint
+      }
+      else if(!operation.compare(L"continue"))
+      {
+	//TODO: continue
+      }
+      else if(!operation.compare(L"quit"))
+	exit(0);
+      else
+	wcout << L"Invalid operation";
       wcout << endl;
-      wcin >> input;
-      debugger.show_storage(input);
-      wcout << endl;
-      debugger.step();
     }
   }
   else
