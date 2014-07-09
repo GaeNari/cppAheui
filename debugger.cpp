@@ -11,6 +11,7 @@ void AheuiDebugger::initialize(AheuiInterpreter *t)
 void AheuiDebugger::show_code()
 {
   target->show_code();
+  wcout << endl;
 }
 
 void AheuiDebugger::show_storage(const wchar_t name)
@@ -27,6 +28,30 @@ void AheuiDebugger::show_storage(const wchar_t name)
     }
     wcout << endl;
   }
+}
+
+void AheuiDebugger::show_breakpoints()
+{
+  vector<struct breakpoint>::const_iterator iter;
+  int count = 0;
+  wcout << endl;
+  for(iter=breakpoints.begin(); iter!=breakpoints.end(); ++iter)
+  {
+    wcout << L"breakpoint " << count++ << L" (" << (*iter).x << L"," << (*iter).y << L")" << endl;
+  }
+}
+
+void AheuiDebugger::set_breakpoint(int x, int y)
+{
+  struct breakpoint b;
+  b.x = x;
+  b.y = y;
+  breakpoints.push_back(b);
+}
+
+void AheuiDebugger::delete_breakpoint(int num)
+{
+  breakpoints.erase(breakpoints.begin()+num);
 }
 
 void AheuiDebugger::step()

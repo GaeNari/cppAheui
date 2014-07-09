@@ -3,7 +3,6 @@
 #include "aheuicode.h"
 #include "interpreter.h"
 #include "debugger.h"
-#include <cstring>
 
 int main(int argc, char **argv)
 {
@@ -23,7 +22,9 @@ int main(int argc, char **argv)
   interpreter.initialize(&code);
   if(argv[2])
   {
-    if(strcmp(argv[2],"-debug"))
+    string option;
+    option = argv[2];
+    if(option.compare("-debug"))
     {
       wcout << L"Only \"-debug\" option is available" << endl;
       exit(1);
@@ -64,10 +65,27 @@ int main(int argc, char **argv)
       else if(!operation.compare(L"break"))
       {
 	//TODO: add breakpoint
+	int x,y;
+	wstringstream ss;
+	ss.str(argument);
+	ss >> x >> y;
+	wcout << L"set breakpoint at " << x << L" " << y << endl;
+	debugger.set_breakpoint(x,y);
+      }
+      else if(!operation.compare(L"show"))
+      {
+	if(!argument.compare(L"breakpoints"))
+	  debugger.show_breakpoints();
       }
       else if(!operation.compare(L"clear"))
       {
 	//TODO: remove breakpoint
+	int number;
+	wstringstream ss;
+	ss.str(argument);
+	ss >> number;
+	wcout << L"delete breakpoint " << number << endl;
+	debugger.delete_breakpoint(number);
       }
       else if(!operation.compare(L"continue"))
       {
