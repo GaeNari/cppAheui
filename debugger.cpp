@@ -66,3 +66,29 @@ void AheuiDebugger::step(int num)
   while(num --> 0)
     this->step();
 }
+
+void AheuiDebugger::cont()
+{
+  while(1)
+  {
+    step();
+    bool hit = false;
+    tuple<int, int> cursor = target->get_cursor();
+    vector<struct breakpoint>::const_iterator iter;
+    int count = 0;
+    for(iter=breakpoints.begin(); iter!=breakpoints.end(); ++iter)
+    {
+      if(((*iter).x == get<0>(cursor)) && ((*iter).y == get<1>(cursor)))
+      {
+	hit = true;
+	break;
+      }
+      count++;
+    }
+    if(hit)
+    {
+      wcout << L"breakpoint " << count << L" (" << (*iter).x << "," << (*iter).y << ")" << endl;
+      break;
+    }
+  }
+}

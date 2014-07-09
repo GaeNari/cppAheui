@@ -64,7 +64,6 @@ int main(int argc, char **argv)
       }
       else if(!operation.compare(L"break"))
       {
-	//TODO: add breakpoint
 	int x,y;
 	wstringstream ss;
 	ss.str(argument);
@@ -79,7 +78,6 @@ int main(int argc, char **argv)
       }
       else if(!operation.compare(L"clear"))
       {
-	//TODO: remove breakpoint
 	int number;
 	wstringstream ss;
 	ss.str(argument);
@@ -89,7 +87,7 @@ int main(int argc, char **argv)
       }
       else if(!operation.compare(L"continue"))
       {
-	//TODO: continue
+	debugger.cont();
       }
       else if(!operation.compare(L"quit"))
 	exit(0);

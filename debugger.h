@@ -22,4 +22,5 @@ public:
   void delete_breakpoint(int num);
   void step();
   void step(int num);
+  void cont();
 };

@@ -214,3 +214,8 @@ AheuiStorage* AheuiInterpreter::get_storage(int index)
   }
   return target;
 }
+
+tuple<int, int> AheuiInterpreter::get_cursor()
+{
+  return make_tuple(cursor.x, cursor.y);
+}
