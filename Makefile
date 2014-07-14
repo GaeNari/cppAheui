@@ -6,7 +6,7 @@ TARGET = main
 
 all : $(TARGET)
 
-CPPFLAGS = -gstabs -std=c++11
+CPPFLAGS = -std=c++11
 
 $(TARGET): $(OBJS)
 	$(CC) $(CPPFLAGS) -o $@ $(OBJS)

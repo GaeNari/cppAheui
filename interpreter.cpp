@@ -52,131 +52,133 @@ void AheuiInterpreter::step()
   {
     cursor.dx *= -1; cursor.dy *= -1;
   }
-  /* 닿소리 */
-  long long a,b;
-  switch(get<0>(broken))
+  else
   {
-    case 2: //ㄴ
-      a = storage->pop();
-      b = storage->pop();
-      storage->push(b/a);
-      break;
-    case 3: //ㄷ
-      a = storage->pop();
-      b = storage->pop();
-      storage->push(b+a);
-      break;
-    case 4: //ㄸ
-      a = storage->pop();
-      b = storage->pop();
-      storage->push(b*a);
-      break;
-    case 5: //ㄹ
-      a = storage->pop();
-      b = storage->pop();
-      storage->push(b%a);
-      break;
-    case 6: //ㅁ
-      a = storage->pop();
-      switch(get<2>(broken))
-      {
-	case 21: //ㅇ
-	  wcout << a;
-	  break;
-	case 27: //ㅎ
-	  wcout << static_cast<wchar_t>(a);
-	  break;
-	default:
-	  break;
-      }
-      break;
-    case 7: //ㅂ
-      switch(get<2>(broken))
-      {
-	case 21: //ㅇ
-	  long long input_num;
-	  wcin >> input_num;
-	  storage->push(a);
-	  break;
-	case 27: //ㅎ
-	  wchar_t input_char;
-	  wcin >> input_char;
-	  storage->push(static_cast<long long>(input_char));
-	  break;
-	default:
-	  storage->push(final_strokes[get<2>(broken)]);
-	  break;
-      }
-      break;
-    case 8: //ㅃ
-      storage->dup();
-      break;
-    case 9: //ㅅ
-      switch(get<2>(broken))
-      {
-	case 21: //ㅇ
-	  storage = queue;
-	  break;
-	case 27: //ㅎ
-	  //TODO: 확장기능 통로
-	  wcout << L"현재 확장기능 통로는 구현되어있지 않습니다" << endl;
-	  assert(false);
-	  break;
-	default:
-	  storage = stack[get<2>(broken)];
-	  break;
-      }
-      break;
-    case 10: //ㅆ
+    /* 닿소리 */
+    long long a,b;
+    switch(get<0>(broken))
     {
-      long long item = storage->pop();
-      AheuiStorage *target;
-      switch(get<2>(broken))
+      case 2: //ㄴ
+        a = storage->pop();
+        b = storage->pop();
+        storage->push(b/a);
+        break;
+      case 3: //ㄷ
+        a = storage->pop();
+        b = storage->pop();
+        storage->push(b+a);
+        break;
+      case 4: //ㄸ
+        a = storage->pop();
+        b = storage->pop();
+        storage->push(b*a);
+        break;
+      case 5: //ㄹ
+        a = storage->pop();
+        b = storage->pop();
+        storage->push(b%a);
+        break;
+      case 6: //ㅁ
+        a = storage->pop();
+        switch(get<2>(broken))
+        {
+	  case 21: //ㅇ
+  	    wcout << a;
+	    break;
+	  case 27: //ㅎ
+	    wcout << static_cast<wchar_t>(a);
+	    break;
+	  default:
+	    break;
+        }
+        break;
+      case 7: //ㅂ
+        switch(get<2>(broken))
+        {
+	  case 21: //ㅇ
+	    wcin >> a;
+	    storage->push(a);
+	    break;
+	  case 27: //ㅎ
+	    wchar_t input_char;
+	    wcin >> input_char;
+	    storage->push(static_cast<long long>(input_char));
+	    break;
+	  default:
+	    storage->push(final_strokes[get<2>(broken)]);
+	    break;
+        }
+        break;
+      case 8: //ㅃ
+        storage->dup();
+        break;
+      case 9: //ㅅ
+        switch(get<2>(broken))
+        {
+	  case 21: //ㅇ
+	    storage = queue;
+	    break;
+	  case 27: //ㅎ
+	    //TODO: 확장기능 통로
+	    wcout << L"현재 확장기능 통로는 구현되어있지 않습니다" << endl;
+	    assert(false);
+	    break;
+	  default:
+	    storage = stack[get<2>(broken)];
+	    break;
+        }
+        break;
+      case 10: //ㅆ
       {
-	case 21: //ㅇ
-	  target = queue;
-	  break;
-	case 27: //ㅎ
-	  //TODO: 확장기능 통로
-	  wcout << L"현재 확장기능 통로는 구현되어있지 않습니다" << endl;
-	  assert(false);
-	  break;
-	default:
-	  target = stack[get<2>(broken)];
-	  break;
+        long long item = storage->pop();
+        AheuiStorage *target;
+        switch(get<2>(broken))
+        {
+	  case 21: //ㅇ
+	    target = queue;
+	    break;
+	  case 27: //ㅎ
+	    //TODO: 확장기능 통로
+	    wcout << L"현재 확장기능 통로는 구현되어있지 않습니다" << endl;
+	    assert(false);
+	   break;
+	  default:
+	    target = stack[get<2>(broken)];
+	    break;
+        }
+        target->push(item);
+        break;
       }
-      target->push(item);
-      break;
+      case 12: //ㅈ
+        a = storage->pop();
+        b = storage->pop();
+        if(b<a) 
+	  storage->push(0);
+        else 
+	  storage->push(1);
+        break;
+      case 14: //ㅊ
+        a = storage->pop();
+        if(a==0)
+        {
+	  cursor.dx *= -1; cursor.dy *= -1;
+        }
+        break;
+      case 16: //ㅌ
+        a = storage->pop();
+        b = storage->pop();
+        storage->push(b-a);
+        break;
+      case 17: //ㅍ
+        storage->swap();
+        break;
+      case 18: //ㅎ
+        if(storage->size() == 0) exit(0);
+        else exit(storage->pop());
+        break;
+      default:
+        break;
     }
-    case 12: //ㅈ
-      a = storage->pop();
-      b = storage->pop();
-      if(b<a) 
-	storage->push(0);
-      else 
-	storage->push(1);
-      break;
-    case 14: //ㅊ
-      a = storage->pop();
-      if(a==0)
-      {
-	cursor.dx *= -1; cursor.dy *= -1;
-      }
-      break;
-    case 16: //ㅌ
-      a = storage->pop();
-      b = storage->pop();
-      storage->push(b-a);
-      break;
-    case 17: //ㅍ
-      storage->swap();
-      break;
-    case 18: //ㅎ
-      if(storage->size() == 0) exit(0);
-      else exit(storage->pop());
-      break;
-    default:
-      break;
   }
 }
 

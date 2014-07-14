@@ -6,6 +6,15 @@
 
 int main(int argc, char **argv)
 {
+  wstring help = L"\
+    help: 도움말\n\
+    step [숫자]: [숫자]단계 실행. 기본값은 1\n\
+    print [글자]: [글자]의 받침에 해당하는 저장공간 출력\n\
+    break [숫자1] [숫자2]: ([숫자1],[숫자2])에 breakpoint를 생성\n\
+    show breakpoints: breakpoint들을 보여줌\n\
+    clear [숫자]: [숫자]번 breakpoint를 삭제. 좌표가 아님에 유의\n\
+    continue: breakpoint를 만날 때까지 계속 step\n\
+    quit: 종료";
   if(argc < 2)
   {
     wcout << L"usage : " << argv[0] << " " << L"<file_name> [-debug]" << endl;
@@ -34,8 +43,8 @@ int main(int argc, char **argv)
     while(true)
     {
       wstring input;
-      wcout << endl;
       debugger.show_code();
+      wcout << L"(debug) ";
       getline(wcin,input);
       int found = input.find(L" ");
       wstring operation;
@@ -50,19 +59,19 @@ int main(int argc, char **argv)
       }
       else
 	operation = input;
-      if(!operation.compare(L"step"))
+      if((!operation.compare(L"s")) || (!operation.compare(L"step")))
       {
 	if(arg_exist)
 	  debugger.step(stoi(argument));
 	else
 	  debugger.step();
       }
-      else if(!operation.compare(L"print"))
+      else if((!operation.compare(L"p")) || (!operation.compare(L"print")))
       {
 	assert(arg_exist);
 	debugger.show_storage(static_cast<wchar_t>(argument[0]));
       }
-      else if(!operation.compare(L"break"))
+      else if((!operation.compare(L"b")) || (!operation.compare(L"break")))
       {
 	int x,y;
 	wstringstream ss;
@@ -85,9 +94,13 @@ int main(int argc, char **argv)
 	wcout << L"delete breakpoint " << number << endl;
 	debugger.delete_breakpoint(number);
       }
-      else if(!operation.compare(L"continue"))
+      else if((!operation.compare(L"c")) || (!operation.compare(L"continue")))
       {
 	debugger.cont();
+      }
+      else if(!operation.compare(L"help"))
+      {
+	wcout << help << endl;
       }
       else if(!operation.compare(L"quit"))
 	exit(0);
