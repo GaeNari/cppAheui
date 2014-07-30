@@ -1,8 +1,12 @@
+#include <unistd.h>
 #include "commonheader.h"
 #include "storage.h"
 #include "aheuicode.h"
 #include "interpreter.h"
 #include "debugger.h"
+
+bool debug_mode = false;
+bool goto_mode = false;
 
 int main(int argc, char **argv)
 {
@@ -17,27 +21,38 @@ int main(int argc, char **argv)
     quit: 종료";
   if(argc < 2)
   {
-    wcout << L"usage : " << argv[0] << " " << L"<file_name> [-debug]" << endl;
+    wcout << L"usage : " << argv[0] << " " << L"<file_name> [options]" << endl;
     exit(1);
   }
   locale::global(locale("ko_KR.UTF-8"));
   AheuiInterpreter interpreter;
   AheuiCode code;
-  if(!code.read_file(argv[1]))
+  int c;
+  while((c = getopt(argc, argv, "dg")) != -1)
+  {
+    switch(c)
+    {
+      case 'd':
+        debug_mode = true;
+	break;
+      case 'g':
+        goto_mode = true;
+	break;
+      case '?':
+	exit(1);
+      default:
+        break;
+    }
+  }
+  if(!code.read_file(argv[optind]))
   {
     wcout << L"Cannot open " << argv[1] << endl;
     exit(1);
   }
-  interpreter.initialize(&code);
-  if(argv[2])
+  interpreter.initialize(&code, goto_mode);
+  if(debug_mode)
   {
     string option;
-    option = argv[2];
-    if(option.compare("-debug"))
-    {
-      wcout << L"Only \"-debug\" option is available" << endl;
-      exit(1);
-    }
     AheuiDebugger debugger;
     debugger.initialize(&interpreter);
     while(true)
@@ -68,7 +83,12 @@ int main(int argc, char **argv)
       }
       else if((!operation.compare(L"p")) || (!operation.compare(L"print")))
       {
-	assert(arg_exist);
+	if(!arg_exist)
+	{
+	  wcout << L"사용법: print <글자>" << endl;
+	  wcout << endl;
+	  continue;
+	}
 	debugger.show_storage(static_cast<wchar_t>(argument[0]));
       }
       else if((!operation.compare(L"b")) || (!operation.compare(L"break")))
@@ -77,7 +97,7 @@ int main(int argc, char **argv)
 	wstringstream ss;
 	ss.str(argument);
 	ss >> x >> y;
-	wcout << L"set breakpoint at " << x << L" " << y << endl;
+	wcout << L"set breakpoint at " << x << L"|" << y << endl;
 	debugger.set_breakpoint(x,y);
       }
       else if(!operation.compare(L"show"))
@@ -98,9 +118,79 @@ int main(int argc, char **argv)
       {
 	debugger.cont();
       }
+      else if(!operation.compare(L"storage") || (!operation.compare(L"st")))
+      {
+	if(!arg_exist)
+	{
+	  wcout << L"사용법: storage <명령> [인자]" << endl;
+	  wcout << endl;
+	  continue;
+	}
+
+	wstring op, arg;
+	found = argument.find(L" ");
+	if(found != -1)
+	{
+	  op = argument.substr(0, found);
+	  arg = argument.substr(found+1);
+	  arg_exist = true;
+	}
+	else
+	{
+	  op = argument;
+	  arg_exist = false;
+	}
+
+	JUJAK_TYPE jujak;
+	if(!op.compare(L"select"))
+	{
+	  if(!arg_exist)
+	  {
+	    wcout << L"select에는 인자가 필요합니다" << endl;
+	    continue;
+	  }
+	  debugger.set_storage(static_cast<wchar_t>(arg[0]));
+	}
+	else if(!op.compare(L"push"))
+	{
+	  if(!arg_exist)
+	  {
+	    wcout << L"push에는 값이 필요합니다" << endl;
+	  }
+	  wstringstream ss;
+	  long long value;
+	  ss.str(arg);
+	  ss >> value;
+	  jujak = STR_PUSH;
+	  debugger.jujak_storage(jujak, value);
+	}
+	else if(!op.compare(L"pop"))
+	{
+	  jujak = STR_POP;
+	  debugger.jujak_storage(jujak);
+	}
+	else if(!op.compare(L"swap"))
+	{
+	  jujak = STR_SWAP;
+	  debugger.jujak_storage(jujak);
+	}
+	else if(!op.compare(L"dup"))
+	{
+	  jujak = STR_DUP;
+	  debugger.jujak_storage(jujak);
+	}
+	else
+	{
+	  wcout << op << L"는 올바르지 않은 명령입니다" << endl;
+	}
+      }
       else if(!operation.compare(L"help"))
       {
 	wcout << help << endl;
+      }
+      else if(!operation.compare(L"move"))
+      {
+
       }
       else if(!operation.compare(L"quit"))
 	exit(0);

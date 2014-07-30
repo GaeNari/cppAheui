@@ -92,3 +92,44 @@ void AheuiDebugger::cont()
     }
   }
 }
+
+void AheuiDebugger::set_storage(const wchar_t name)
+{
+  unsigned int index = (static_cast<unsigned int>(name) - 0xac00) % 28;
+  AheuiStorage *storage = target->get_storage(index);
+  this->storage = storage;
+}
+
+void AheuiDebugger::jujak_storage(JUJAK_TYPE type)
+{
+  switch(type)
+  {
+    case STR_POP:
+      this->storage->pop();
+      break;
+    case STR_SWAP:
+      this->storage->swap();
+      break;
+    case STR_DUP:
+      this->storage->dup();
+      break;
+    default:
+      wcout << L"삐용삐용 에러가 생겼습니다 으아 죽는다아" << endl;
+      exit(1);
+      break;
+  }
+}
+
+void AheuiDebugger::jujak_storage(JUJAK_TYPE type, long long value)
+{
+  switch(type)
+  {
+    case STR_PUSH:
+      this->storage->push(value);
+      break;
+    default:
+      wcout << L"삐용삐용 에러가 생겼습니다 으악 죽는다아" << endl;
+      exit(1);
+      break;
+  }
+}

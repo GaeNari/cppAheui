@@ -5,16 +5,21 @@
 
 const int AheuiInterpreter::required_elements[] =
 {
-    0, 0, 2, 2, 2, 2, 1, 0, 1, 0, 1, 0, 2, 0, 1, 0, 2, 2, 0
+  0, 0, 2, 2, 2, 2, 1, 0, 1, 0, 1, 0, 2, 0, 1, 0, 2, 2, 0
+};
+
+const int AheuiInterpreter::required_elements_go_to[] =
+{
+  0, 2, 2, 2, 2, 2, 1, 0, 1, 0, 1, 0, 2, 0, 1, 0, 2, 2, 0
 };
 
 const int AheuiInterpreter::final_strokes[] =
 {
-    0, 2, 4, 4, 2, 5, 5, 3, 5, 7, 9, 9, 7, 9,
-    9, 8, 4, 4, 6, 2, 4, 1, 3, 4, 3, 4, 4, 3
+  0, 2, 4, 4, 2, 5, 5, 3, 5, 7, 9, 9, 7, 9,
+  9, 8, 4, 4, 6, 2, 4, 1, 3, 4, 3, 4, 4, 3
 };
 
-void AheuiInterpreter::initialize(AheuiCode *ah)
+void AheuiInterpreter::initialize(AheuiCode *ah, bool goto_mode)
 {
   code = ah;
   cursor.x = 0;
@@ -26,11 +31,27 @@ void AheuiInterpreter::initialize(AheuiCode *ah)
   queue = new AheuiQueue;
   storage = stack[0];
   delete stack[21]; //ㅇ 스택은 없음
+  if(goto_mode)
+  {
+    this->goto_mode = true;
+    required = required_elements_go_to;
+  }
+  else 
+  {
+    this->goto_mode = false;
+    required = required_elements;
+  }
 }
 
 void AheuiInterpreter::step()
 {
-  tuple<int, int, int> broken = code->split_code(code->get_code(cursor.x, cursor.y));
+  wchar_t current = code->get_code(cursor.x, cursor.y);
+  execute(current);
+}
+
+void AheuiInterpreter::execute(wchar_t character)
+{
+  tuple<int, int, int> broken = code->split_code(character);
 
   /* 홀소리 */
   switch(get<1>(broken))
@@ -48,7 +69,7 @@ void AheuiInterpreter::step()
     case 20: cursor.dx *= -1; break;                  //ㅣ
     default: break;
   }
-  if(storage->size() < required_elements[get<0>(broken)])
+  if(storage->size() < required[get<0>(broken)])
   {
     cursor.dx *= -1; cursor.dy *= -1;
   }
@@ -58,6 +79,15 @@ void AheuiInterpreter::step()
     long long a,b;
     switch(get<0>(broken))
     {
+      case 0: //ㄱ(not standard)
+        if(this->goto_mode)
+	{
+	  a = storage->pop();
+	  b = storage->pop();
+	  cursor.dx = a - cursor.x;
+	  cursor.dy = b - cursor.y;
+	}
+	break;
       case 2: //ㄴ
         a = storage->pop();
         b = storage->pop();
@@ -164,6 +194,18 @@ void AheuiInterpreter::step()
 	  cursor.dx *= -1; cursor.dy *= -1;
         }
         break;
+      case 15: //ㅋ(not standard)
+      {
+	if(this->goto_mode)
+	{
+	  tuple<int, int> now = get_cursor();
+	  a = get<0>(now);
+	  b = get<1>(now);
+	  storage->push(a);
+	  storage->push(b);
+	}
+	break;
+      }
       case 16: //ㅌ
         a = storage->pop();
         b = storage->pop();
@@ -190,6 +232,19 @@ void AheuiInterpreter::move_cursor()
   if(cursor.x >= code->x_size()) cursor.x = 0;
   if(cursor.y < 0) cursor.y = code->y_size() - 1;
   if(cursor.y >= code->y_size()) cursor.y = 0;
+}
+
+void AheuiInterpreter::move_cursor(int x, int y)
+{
+  if((x<0)||(x>=code->x_size())||(y<0)||(y>=code->y_size()))
+  {
+    return;
+  }
+  else
+  {
+    cursor.x = x;
+    cursor.y = y;
+  }
 }
 
 void AheuiInterpreter::show_code()
